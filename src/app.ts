@@ -3,6 +3,8 @@ import { CreateRoom } from "./Routes/create_room";
 import path from "node:path";
 import { GetRoom } from "./Routes/get_room";
 import { GetMyRoom } from "./Routes/get_my_rooms";
+import { AddParticipants } from "./Routes/add_participants";
+import { RemoveParticipants } from "./Routes/remove_participants";
 
 const app: Application = express();
 const router: express.Router = express.Router();
@@ -16,5 +18,7 @@ app.get("/", (req, res) => { res.sendFile(path.join(__dirname, "..", "public", "
 router.post("/api/create-room", CreateRoom);
 router.get("/api/get-room/:roomId", GetRoom);
 router.get("/api/get-my-room", GetMyRoom);
+router.get("/api/add-participants/:roomId/:participant", AddParticipants);
+router.get("/api/remove-participants/:roomId/:participant", RemoveParticipants);
 
 export default app;

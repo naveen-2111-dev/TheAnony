@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
-import { db } from "../../config";
 import { getLocalIP } from "../utils/getIp";
+import { getCollection } from "../utils/connect";
+import moment from "moment";
+import { Hash } from "../utils/hash";
 
 export async function CreateRoom(req: Request, res: Response) {
     try {
@@ -16,14 +18,29 @@ export async function CreateRoom(req: Request, res: Response) {
             return res.status(400).json({ success: false, message: "IP address not found" });
         }
 
-        const roomRef = db.ref(`rooms/${roomId}`);
+        const collection = await getCollection("rooms");
+        const existingRoom = await collection.findOne({ roomId: roomId });
 
-        await roomRef.set({
-            owner: ip,
-            createdAt: Date.now(),
-        });
+        if (existingRoom) {
+            return res.status(409).json({ success: false, message: "Room ID already exists" });
+        }
 
-        return res.status(200).json({ success: true, roomId });
+        const newRoom = {
+            room: {
+                roomId: roomId,
+                hostIp: Hash(ip),
+                participants: [],
+            },
+            createdAt: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+        };
+
+        const response = await collection.insertOne(newRoom);
+
+        if (!response.acknowledged) {
+            return res.status(500).json({ success: false, message: "Failed to create room" });
+        }
+
+        return res.status(201).json({ success: true, message: "Room created successfully", roomId: roomId });
     } catch (error) {
         console.error("Failed to create room:", error);
         return res.status(500).json({

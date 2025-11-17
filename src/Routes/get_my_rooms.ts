@@ -1,34 +1,20 @@
 import { Request, Response } from "express";
-import { db } from "../../config";
 import { getLocalIP } from "../utils/getIp";
 import { Room } from "../../types";
+import { getCollection } from "../utils/connect";
 
 export async function GetMyRoom(req: Request, res: Response) {
     try {
         const ip = getLocalIP();
 
-        const roomsRef = db.ref("rooms");
-        const snapshot = await roomsRef
-            .orderByChild("owner")
-            .equalTo(ip)
-            .once('value');
+        const collection = await getCollection("rooms");
+        const myRoom = await collection.findOne({ "room.hostIp": ip }) as Room | null;
 
-        if (!snapshot.exists()) {
-            return res.status(200).json({ success: true, rooms: [] });
+        if (!myRoom) {
+            return res.status(404).json({ success: false, message: "No room found for this host IP" });
         }
 
-        const rooms: Room[] = [];
-        const data = snapshot.val() as Record<string, Room> | null;
-        if (data) {
-            for (const [key, value] of Object.entries(data)) {
-                rooms.push({
-                    ...value,
-                    roomId: key
-                });
-            }
-        }
-
-        return res.status(200).json({ success: true, rooms });
+        return res.status(200).json({ success: true, room: myRoom });
     } catch (error) {
         console.error("Failed to get room:", error);
         return res.status(500).json({
