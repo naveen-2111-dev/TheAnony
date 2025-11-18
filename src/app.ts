@@ -1,6 +1,7 @@
-import express, { Application } from "express";
-import { CreateRoom } from "./Routes/create_room";
+import express, { Application, Router, Request, Response } from "express";
 import path from "node:path";
+
+import { CreateRoom } from "./Routes/create_room";
 import { GetRoom } from "./Routes/get_room";
 import { GetMyRoom } from "./Routes/get_my_rooms";
 import { AddParticipants } from "./Routes/add_participants";
@@ -9,24 +10,26 @@ import { GetIp } from "./Routes/get_ip";
 import { Chat } from "./Routes/chat";
 
 const app: Application = express();
-const router: express.Router = express.Router();
+const router: Router = express.Router();
 
 app.use(express.json());
-app.use(router);
-app.use(express.static(path.join(__dirname, "..", "public")))
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
-//routes
-app.get("/", (req, res) => { res.sendFile(path.join(__dirname, "..", "public", "index.html")) });
-router.get("/api/get-room/:roomId", GetRoom);
-router.get("/api/get-my-room", GetMyRoom);
-router.get("/api/get-my-ip", GetIp);
+// home
+app.get("/", (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+});
 
-//post routes
-router.post("/api/create-room/", CreateRoom);
-router.post("/api/chat/:roomId/:ip", Chat);
-router.post("/api/add-participants/:roomId/:participant", AddParticipants);
-router.post("/api/remove-participants/:roomId/:participant", RemoveParticipants);
+// API routes
+app.use("/api", router);
 
-app.use("/public", express.static(path.join(process.cwd(), "public")));
+router.get("/get-room/:roomId", GetRoom);
+router.get("/get-my-room", GetMyRoom);
+router.get("/get-my-ip", GetIp);
+
+router.post("/create-room", CreateRoom);
+router.post("/chat/:roomId/:ip", Chat);
+router.post("/add-participants/:roomId/:participant", AddParticipants);
+router.post("/remove-participants/:roomId/:participant", RemoveParticipants);
 
 export default app;
