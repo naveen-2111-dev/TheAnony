@@ -3,7 +3,6 @@ import { nanoid } from "nanoid";
 import { getLocalIP } from "../utils/getIp";
 import { getCollection } from "../utils/connect";
 import moment from "moment";
-import { Hash } from "../utils/hash";
 
 export async function CreateRoom(req: Request, res: Response) {
     try {
@@ -19,17 +18,18 @@ export async function CreateRoom(req: Request, res: Response) {
         }
 
         const collection = await getCollection("rooms");
-        const existingRoom = await collection.findOne({ roomId: roomId });
+        const existingRoom = await collection.findOne({ "room.roomId": roomId });
 
         if (existingRoom) {
-            return res.status(409).json({ success: false, message: "Room ID already exists" });
+            return res.status(500).json({ success: false, message: "Room ID already exists" });
         }
 
         const newRoom = {
             room: {
                 roomId: roomId,
-                hostIp: Hash(ip),
+                hostIp: ip,
                 participants: [],
+                chat: []
             },
             createdAt: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
         };

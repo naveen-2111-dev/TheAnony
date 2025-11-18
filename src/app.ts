@@ -5,6 +5,8 @@ import { GetRoom } from "./Routes/get_room";
 import { GetMyRoom } from "./Routes/get_my_rooms";
 import { AddParticipants } from "./Routes/add_participants";
 import { RemoveParticipants } from "./Routes/remove_participants";
+import { GetIp } from "./Routes/get_ip";
+import { Chat } from "./Routes/chat";
 
 const app: Application = express();
 const router: express.Router = express.Router();
@@ -15,10 +17,14 @@ app.use(express.static(path.join(__dirname, "..", "public")))
 
 //routes
 app.get("/", (req, res) => { res.sendFile(path.join(__dirname, "..", "public", "index.html")) });
-router.post("/api/create-room", CreateRoom);
 router.get("/api/get-room/:roomId", GetRoom);
 router.get("/api/get-my-room", GetMyRoom);
-router.get("/api/add-participants/:roomId/:participant", AddParticipants);
-router.get("/api/remove-participants/:roomId/:participant", RemoveParticipants);
+router.get("/api/get-my-ip", GetIp);
+
+//post routes
+router.post("/api/create-room/", CreateRoom);
+router.post("/api/chat/:roomId/:ip", Chat);
+router.post("/api/add-participants/:roomId/:participant", AddParticipants);
+router.post("/api/remove-participants/:roomId/:participant", RemoveParticipants);
 
 export default app;

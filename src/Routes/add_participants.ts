@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getCollection } from "../utils/connect";
-import { Hash } from "../utils/hash";
 
 export async function AddParticipants(req: Request, res: Response) {
     try {
@@ -21,7 +20,7 @@ export async function AddParticipants(req: Request, res: Response) {
 
         await collection.updateOne(
             { "room.roomId": roomId },
-            { $addToSet: { "room.participants": Hash(participant) } }
+            { $addToSet: { "room.participants": participant } }
         );
 
         const updatedRoom = await collection.findOne({ "room.roomId": roomId });

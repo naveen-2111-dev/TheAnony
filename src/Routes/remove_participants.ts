@@ -27,6 +27,13 @@ export async function RemoveParticipants(req: Request, res: Response) {
 
         const updatedRoom = await collection.findOne({ "room.roomId": roomId });
 
+        if (updatedRoom?.room.participants.length === 0) {
+            await collection.updateOne(
+                { "room.roomId": roomId },
+                { $unset: { "room.chat": [] } }
+            );
+        }
+
         return res.status(200).json({
             success: true,
             room: updatedRoom

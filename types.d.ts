@@ -6,7 +6,8 @@ interface Chat {
 
 interface Room {
     roomId: string;
-    owner: string;
+    hostIp: string;
+    participants: string[];
     chat: Chat[];
     createdAt: number;
 }
