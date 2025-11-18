@@ -37,6 +37,7 @@
   },
   "include": [
     "src/**/*",
-    "index.ts"
+    "api/index.ts",
+    "api"
   ]
 }

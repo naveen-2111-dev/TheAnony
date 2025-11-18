@@ -1,8 +1,8 @@
 import express from "express";
 import serverless from "serverless-http";
-import app from "./src/app";
 
 import { configDotenv } from "dotenv";
+import app from "../src/app";
 
 configDotenv();
 
