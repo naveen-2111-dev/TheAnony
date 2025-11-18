@@ -27,4 +27,6 @@ router.post("/api/chat/:roomId/:ip", Chat);
 router.post("/api/add-participants/:roomId/:participant", AddParticipants);
 router.post("/api/remove-participants/:roomId/:participant", RemoveParticipants);
 
+app.use("/public", express.static(path.join(process.cwd(), "public")));
+
 export default app;
